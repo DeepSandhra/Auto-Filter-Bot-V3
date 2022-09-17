@@ -3,12 +3,12 @@ import logging
 import random
 import asyncio
 from Script import script
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, FloodWait
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
-from info import CHANNELS, ADMINS, AUTH_CHANNEL, LOG_CHANNEL, PICS, CUSTOM_FILE_CAPTION, BATCH_FILE_CAPTION, PROTECT_CONTENT
+from info import CHANNELS, ADMINS, AUTH_CHANNEL, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT
 from utils import get_settings, get_size, is_subscribed, save_group_settings, temp
 from database.connections_mdb import active_connection
 import re
@@ -18,17 +18,20 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 
-@Client.on_message(filters.command("start"))
+@Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
-    if message.chat.type in ['group', 'supergroup']:
+    if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         buttons = [
             [
-                InlineKeyboardButton('Cʀᴇᴀᴛᴏʀ ⭐', url=f"https://t.me/movi2x")
+                InlineKeyboardButton('📢 Updates', url='https://t.me/mdiskmovieshd_2022')
+            ],
+            [
+                InlineKeyboardButton('🆘Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
             ]
             ]
         reply_markup = InlineKeyboardMarkup(buttons)
-        await message.reply(script.PRIVATEBOT_TXT.format(message.from_user.mention if message.from_user else message.chat.title, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup)
-        await asyncio.sleep(2) # 😢 https://github.com/Aadhi000/Ajax-Extra-Features/blob/master/plugins/p_ttishow.py#L17 😬 wait a bit, before checking.
+        await message.reply(script.START_TXT.format(message.from_user.mention if message.from_user else message.chat.title, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup)
+        await asyncio.sleep(2) # 😢 https://github.com/EvamariaTG/EvaMaria/blob/master/plugins/p_ttishow.py#L17 😬 wait a bit, before checking.
         if not await db.get_chat(message.chat.id):
             total=await client.get_chat_members_count(message.chat.id)
             await client.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(message.chat.title, message.chat.id, total, "Unknown"))       
@@ -43,20 +46,20 @@ async def start(client, message):
             ],[
             InlineKeyboardButton('𝙼𝙾𝚅𝙸𝙴𝚂 𝚁𝙴𝚀𝚄𝙴𝚂𝚃 𝙱𝙾𝚃 🎬', url='https://t.me/MovieRequestGroup_rebot')
             ],[
-            InlineKeyboardButton('♥Mʏ ɢʀᴏᴜᴘ♥', url='https://t.me/Movies_hunt_2022')
+            InlineKeyboardButton('♥Mʏ ɢʀᴏᴜᴘ♥', url='https://t.me/punjabiflix1')
             ],[
-            InlineKeyboardButton('ᴍᴏᴠɪᴇꜱ ᴄʜᴀɴɴᴇʟ 📥', url='https://t.me/Movies_DATABASE_2022'),
+            InlineKeyboardButton('ᴍᴏᴠɪᴇꜱ ᴄʜᴀɴɴᴇʟ 📥', url='https://t.me/mdiskmovieshd_2022'),
             InlineKeyboardButton('𝚂𝙴𝙰𝚁𝙲𝙷 𝙷𝙴𝚁𝙴 𝙼𝙾𝚅𝙸𝙴🔎', switch_inline_query_current_chat='')
             ],[
             InlineKeyboardButton(' Cᴏɴᴛᴀᴄᴛ😎 ', url='https://t.me/movi2x'),
-            InlineKeyboardButton('Sᴏᴜʀᴄᴇ🗃️', url='https://t.me/MovieRequestGroup_rebot')
+            InlineKeyboardButton('Sᴏᴜʀᴄᴇ🗃️', url='https://t.me/new_punjabi_movie_2022_23')
             ],[      
             InlineKeyboardButton('♻️ Hᴇʟᴘ ♻️', callback_data='help'),
             InlineKeyboardButton('📛 ΛBOUT 📛', callback_data='about')
             ],[
             InlineKeyboardButton('✅ 𝚂𝚞𝚋𝚜𝚌𝚛𝚒𝚋𝚎  ✅', url='https://youtube.com/channel/UC36Y9w_AM4H_ZWipKUg93QQ')
-        ]]         
-        reply_markup = InlineKeyboardMarkup(buttons)        
+        ]]
+        reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply_photo(
             photo=random.choice(PICS),
             caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
